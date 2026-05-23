@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8mb4 COLLATE utf8mb4_uncode_ci; 
+CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8 COLLATE utf8_general_ci; 
 USE u_siirs;
 
 DROP TABLE IF EXIST notifications;
@@ -85,4 +85,4 @@ CREATE TABLE IF NOT EXIST contact_messages (
 ) ENGINE=InnoDB;
 
 INSERT INTO admins (full_name, email, password_hash) VALUES
-('System Admin', 'admin@utem.edu.my', '$2b$10$qx5GjiFrbf9Nr0Y6/Kb7T.UGgMRvcaWmr2RiE2gKClPhRJz.1COtG');
+('System Admin', 'admin@utem.edu.my', '$2b$10$qx5GjiFrbf9Nr0Y6/Kb7T.UGgMRvcaWmr2RiE2gKClPhRJz.1COtG') ENGINE=InnoDB;
