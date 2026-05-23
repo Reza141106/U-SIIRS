@@ -1,4 +1,3 @@
-Assalammualaikum
-git add 
+Assalammualaikum 
 # U-SIIRS
 
