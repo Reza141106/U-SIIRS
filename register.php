@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $pw2 = $_POST['password2'] ?? '';
     if (strlen($name)<2 || strlen($name)>100) $err='Name must be 2-100 chars.';
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err='Invalid email.';
-    elseif (!preg_match('/^[a-z]\d{9}@student\.utem\.edu\.my$/i', $email)) $err='Must use a valid UTeM student email (e.g. D032410372@student.utem.edu.my).';
+    elseif (!preg_match('/^[a-z]\d{9}@student\.utem\.edu\.my$/i', $email)) $err='Must use a valid UTeM student email (e.g. D123456789@student.utem.edu.my).';
     elseif (strlen($pw)<8) $err='Password must be at least 8 characters.';
     elseif (!preg_match('/[A-Z]/',$pw) || !preg_match('/[a-z]/',$pw) || !preg_match('/[0-9]/',$pw)) $err='Password must include upper, lower and digit.';
     elseif ($pw !== $pw2) $err='Passwords do not match.';
