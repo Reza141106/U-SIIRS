@@ -1,5 +1,5 @@
 -- U-SIIRS database schema
-CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8mb4 COLLATE utf8_general_ci;
 USE u_siirs;
 
 DROP TABLE IF EXISTS notifications;
