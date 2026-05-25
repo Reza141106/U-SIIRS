@@ -27,6 +27,7 @@ if (!defined('BASE_URL')) {
 }
 
 if (session_status() === PHP_SESSION_NONE) session_start();
+date_default_timezone_set('Asia/Kuala_Lumpur'); 
 
 function e($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 function redirect($p){ header('Location: '.BASE_URL.'/'.ltrim($p,'/')); exit; }
