@@ -2,12 +2,14 @@
 $err = '';
 $token = trim($_GET['token'] ?? '');
 
-$s = $pdo->prepare('SELECT * FROM users WHERE reset_token=? AND reset_expires > NOW()');
+$s = $pdo->prepare('SELECT id, email FROM users WHERE reset_token=? AND reset_expires > NOW()');
 $s->execute([$token]);
 $u = $s->fetch();
 
 if (!$u) {
-    die('<p style="text-align:center;margin-top:3rem;">This reset link is invalid or has expired. <a href="'.BASE_URL.'/forgot-password.php">Request a new one</a>.</p>');
+    // FIXED: replaced die() + raw HTML with flash + redirect (re-evaluation issue)
+    flash('error', 'This reset link is invalid or has expired. Please request a new one.');
+    redirect('forgot-password.php');
 }
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
@@ -30,9 +32,11 @@ include __DIR__.'/includes/header.php';
 ?>
 <div class="auth-layout">
   <div class="auth-left">
-    <div style="color:#fff; text-align:center;">
-      <div style="font-family:'DM Serif Display',serif; font-size:2.5rem;">New Password</div>
-      <p style="opacity:.85; margin-top:1rem;">Choose a strong password for your account.</p>
+    <div class="auth-shape" style="width:250px;height:250px;top:-60px;right:-60px;"></div>
+    <div class="auth-left-content">
+      <div class="auth-brand-badge">&#x1F512; Secure Reset</div>
+      <div class="auth-brand-title">New Password</div>
+      <p class="auth-brand-sub">Choose a strong password<br>for your account.</p>
     </div>
   </div>
   <div class="auth-right">
@@ -43,15 +47,27 @@ include __DIR__.'/includes/header.php';
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <div class="form-group">
           <label class="form-label">New Password</label>
-          <input type="password" class="form-control" name="password" required minlength="8">
+          <div class="input-wrap">
+            <input id="rp-pw1" type="password" class="form-control" name="password" required minlength="8" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('rp-pw1', this)" aria-label="Show/hide password">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="form-hint">8+ chars, include upper, lower and a digit.</div>
         </div>
         <div class="form-group">
           <label class="form-label">Confirm New Password</label>
-          <input type="password" class="form-control" name="password2" required minlength="8">
+          <div class="input-wrap">
+            <input id="rp-pw2" type="password" class="form-control" name="password2" required minlength="8" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('rp-pw2', this)" aria-label="Show/hide password">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
-        <button class="btn btn-primary" style="width:100%;">Reset Password</button>
+        <button class="btn btn-login btn-full">Reset Password</button>
       </form>
+      <div class="auth-switch"><a class="link" href="<?= BASE_URL ?>/login.php">← Back to Login</a></div>
     </div>
   </div>
 </div>
-</div></body></html>
+<?php include __DIR__.'/includes/footer.php'; ?>
