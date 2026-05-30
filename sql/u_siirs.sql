@@ -1,5 +1,15 @@
--- U-SIIRS database schema
-CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8mb4 COLLATE utf8_general_ci;
+-- ============================================================================
+-- U-SIIRS Database Schema
+-- UTeM Smart Infrastructure Issue Reporting System
+-- ============================================================================
+-- IMPROVEMENTS:
+--   - Added INDEX idx_is_read on contact_messages (is_read) to avoid full scans
+--     on the admin badge query (SELECT COUNT(*) WHERE is_read=0) run on every page.
+--   - Added INDEX idx_created_at on reports (created_at) since most list queries
+--     ORDER BY this column.
+-- ============================================================================
+
+CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE u_siirs;
 
 DROP TABLE IF EXISTS notifications;
@@ -8,84 +18,109 @@ DROP TABLE IF EXISTS report_attachments;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS contact_messages;
 
+-- ── Users ─────────────────────────────────────────────────────────────────────
 CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  full_name VARCHAR(100) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  avatar VARCHAR(255) DEFAULT NULL,
-  is_banned TINYINT(1) NOT NULL DEFAULT 0,
-  reset_token VARCHAR(64) DEFAULT NULL,
-  reset_expires DATETIME DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    full_name     VARCHAR(100)  NOT NULL,
+    email         VARCHAR(255)  NOT NULL UNIQUE,
+    password_hash VARCHAR(255)  NOT NULL,
+    avatar        VARCHAR(255)  DEFAULT NULL,
+    is_banned     TINYINT(1)    NOT NULL DEFAULT 0,
+    reset_token   VARCHAR(64)   DEFAULT NULL,
+    reset_expires DATETIME      DEFAULT NULL,
+    created_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email     (email),
+    INDEX idx_is_banned (is_banned)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Admins ────────────────────────────────────────────────────────────────────
 CREATE TABLE admins (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  full_name VARCHAR(100) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    full_name     VARCHAR(100)  NOT NULL,
+    email         VARCHAR(255)  NOT NULL UNIQUE,
+    password_hash VARCHAR(255)  NOT NULL,
+    created_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Reports ───────────────────────────────────────────────────────────────────
 CREATE TABLE reports (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  title VARCHAR(150) NOT NULL,
-  category VARCHAR(50) NOT NULL,
-  description TEXT NOT NULL,
-  location VARCHAR(200) NOT NULL,
-  photo VARCHAR(255) DEFAULT NULL,
-  status ENUM('Pending','In Progress','Resolved') NOT NULL DEFAULT 'Pending',
-  priority ENUM('Low','Medium','High','Critical') NOT NULL DEFAULT 'Medium',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_reports_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_status (status),
-  INDEX idx_user (user_id)
-) ENGINE=InnoDB;
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT           NOT NULL,
+    title       VARCHAR(150)  NOT NULL,
+    category    VARCHAR(50)   NOT NULL,
+    description TEXT          NOT NULL,
+    location    VARCHAR(200)  NOT NULL,
+    photo       VARCHAR(255)  DEFAULT NULL,
+    status      ENUM('Pending','In Progress','Resolved','Closed','Rejected')
+                              NOT NULL DEFAULT 'Pending',
+    priority    ENUM('Low','Medium','High','Critical')
+                              NOT NULL DEFAULT 'Medium',
+    admin_notes TEXT          DEFAULT NULL,
+    created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reports_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_status     (status),
+    INDEX idx_user       (user_id),
+    -- IMPROVEMENT: Index on created_at because most queries ORDER BY this column
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Report Attachments ────────────────────────────────────────────────────────
 CREATE TABLE report_attachments (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  report_id INT NOT NULL,
-  filename VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_att_report FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    report_id  INT           NOT NULL,
+    filename   VARCHAR(255)  NOT NULL,
+    created_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_att_report FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
+    INDEX idx_att_report (report_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Status Audit Trail ────────────────────────────────────────────────────────
 CREATE TABLE status_updates (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  report_id INT NOT NULL,
-  status ENUM('Pending','In Progress','Resolved') NOT NULL,
-  remarks TEXT DEFAULT NULL,
-  changed_by_admin_id INT DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_su_report FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
-  CONSTRAINT fk_su_admin FOREIGN KEY (changed_by_admin_id) REFERENCES admins(id) ON DELETE SET NULL
-) ENGINE=InnoDB;
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    report_id           INT     NOT NULL,
+    status              ENUM('Pending','In Progress','Resolved','Closed','Rejected') NOT NULL,
+    remarks             TEXT    DEFAULT NULL,
+    changed_by_admin_id INT     DEFAULT NULL,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_su_report FOREIGN KEY (report_id)           REFERENCES reports(id) ON DELETE CASCADE,
+    CONSTRAINT fk_su_admin  FOREIGN KEY (changed_by_admin_id) REFERENCES admins(id)  ON DELETE SET NULL,
+    INDEX idx_su_report (report_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Notifications ─────────────────────────────────────────────────────────────
 CREATE TABLE notifications (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  report_id INT DEFAULT NULL,
-  message VARCHAR(500) NOT NULL,
-  is_read TINYINT(1) NOT NULL DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_notif_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT fk_notif_report FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE SET NULL
-) ENGINE=InnoDB;
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT          NOT NULL,
+    report_id  INT          DEFAULT NULL,
+    message    VARCHAR(500) NOT NULL,
+    is_read    TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_notif_user   FOREIGN KEY (user_id)   REFERENCES users(id)   ON DELETE CASCADE,
+    CONSTRAINT fk_notif_report FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE SET NULL,
+    INDEX idx_notif_user   (user_id),
+    INDEX idx_notif_is_read (is_read)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS contact_messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  subject VARCHAR(150) NOT NULL,
-  message TEXT NOT NULL,
-  is_read TINYINT(1) NOT NULL DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+-- ── Contact Messages ──────────────────────────────────────────────────────────
+CREATE TABLE contact_messages (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL,
+    email      VARCHAR(255) NOT NULL,
+    subject    VARCHAR(150) NOT NULL,
+    message    TEXT         NOT NULL,
+    is_read    TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    -- IMPROVEMENT: Index on is_read prevents full table scan on admin badge query
+    -- (SELECT COUNT(*) FROM contact_messages WHERE is_read=0) runs on every admin page.
+    INDEX idx_is_read   (is_read),
+    INDEX idx_created   (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Default admin: admin@utem.edu.my / Admin@123
-INSERT INTO admins (full_name,email,password_hash) VALUES
-('System Admin','admin@utem.edu.my','$2b$10$qx5GjiFrbf9Nr0Y6/Kb7T.UGgMRvcaWmr2RiE2gKClPhRJz.1COtG');
+-- ── Default Admin Account ──────────────────────────────────────────────────────
+-- Credentials: admin@utem.edu.my / Admin@123
+-- NOTE: In production, this seed data would be replaced with a secure setup process.
+INSERT INTO admins (full_name, email, password_hash) VALUES
+('System Admin', 'admin@utem.edu.my', '$2b$10$qx5GjiFrbf9Nr0Y6/Kb7T.UGgMRvcaWmr2RiE2gKClPhRJz.1COtG');
