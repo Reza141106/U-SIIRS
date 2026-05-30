@@ -1,0 +1,4 @@
+# Prevent execution of PHP files uploaded by users
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Deny from all
+</FilesMatch>
