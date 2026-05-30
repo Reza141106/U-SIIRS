@@ -191,10 +191,17 @@ include __DIR__.'/includes/navbar.php';
         <input type="hidden" name="csrf"   value="<?= e(csrf_token()) ?>">
         <input type="hidden" name="action" value="delete_account">
         <div class="form-group" style="max-width:360px;">
-          <label class="form-label">Confirm with your password</label>
-          <input type="password" class="form-control" name="confirm_password" required
-                 placeholder="Enter your current password" autocomplete="current-password">
-        </div>
+  <label class="form-label">Confirm with your password</label>
+  <div class="input-wrap">
+    <input id="deletePwField" type="password" class="form-control" name="confirm_password" required
+           placeholder="Enter your current password" autocomplete="current-password">
+    <button type="button" class="pw-toggle" onclick="togglePw('deletePwField', this)" aria-label="Show or hide password">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
+  </div>
+</div>
         <button class="btn btn-danger" type="submit">Permanently Delete My Account</button>
       </form>
     </div>
