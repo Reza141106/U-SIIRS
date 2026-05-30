@@ -1,18 +1,35 @@
-<?php require_once __DIR__ . '/../config/database.php'; ?>
-<!DOCTYPE html>
+<?php
+/**
+ * includes/header.php
+ * HTML <head> and opening <body> — included on every page.
+ * IMPROVEMENT: Removed inline style="display:flex" (now in .page.active CSS).
+ * IMPROVEMENT: Preconnect hints for Google Fonts + system-font fallback for offline safety.
+ */
+require_once __DIR__ . '/../config/database.php';
+?><!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= isset($PAGE_TITLE) ? e($PAGE_TITLE).' — U-SIIRS' : 'U-SIIRS — UTeM Smart Infrastructure Issue Reporting System' ?></title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><?= isset($PAGE_TITLE) ? e($PAGE_TITLE) . ' — U-SIIRS' : 'U-SIIRS — UTeM Smart Infrastructure Issue Reporting System' ?></title>
+  <!-- Preconnect for faster font load when online -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Google Fonts — gracefully degrades to system fonts if offline -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
 </head>
 <body>
-<div class="page active" style="display:flex;">
+<div class="page active">
+
+<?php /* Flash messages — rendered as toast notifications */ ?>
 <?php if (!empty($_SESSION['flash']['error'])): ?>
-  <div class="toast-container"><div class="toast danger"><?= e(flash('error')) ?></div></div>
+  <div class="toast-container">
+    <div class="toast danger"><?= e(flash('error')) ?></div>
+  </div>
 <?php endif; ?>
 <?php if (!empty($_SESSION['flash']['success'])): ?>
-  <div class="toast-container"><div class="toast success"><?= e(flash('success')) ?></div></div>
+  <div class="toast-container">
+    <div class="toast success"><?= e(flash('success')) ?></div>
+  </div>
 <?php endif; ?>
