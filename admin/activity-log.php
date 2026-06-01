@@ -18,7 +18,9 @@ if ($filterAdmin > 0) {
     $params[] = $filterAdmin;
 }
 
-$total      = (int)$pdo->query("SELECT COUNT(*) FROM admin_activity_log l WHERE $where")->fetchColumn();
+$countStmt  = $pdo->prepare("SELECT COUNT(*) FROM admin_activity_log l WHERE $where");
+$countStmt->execute($params);
+$total      = (int)$countStmt->fetchColumn();
 $totalPages = max(1, (int)ceil($total / $perPage));
 
 $stmt = $pdo->prepare(
