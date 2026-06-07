@@ -36,18 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = strtolower(trim($_POST['email'] ?? ''));
         $pw    = $_POST['password'] ?? '';
 
-        $s = $pdo->prepare('SELECT id, password_hash FROM admins WHERE email = ?');
-        $s->execute([$email]);
-        $a = $s->fetch();
-
-        if (!$a || !password_verify($pw, $a['password_hash'])) {
+        // ── UTeM domain restriction ───────────────────────────────────────────
+        if (!str_ends_with($email, '@utem.edu.my')) {
             $rl['attempts'][] = $now;
-            $err = 'Invalid admin credentials.';
+            $err = 'Admin access is restricted to @utem.edu.my email addresses only.';
         } else {
-            unset($_SESSION['admin_login_rl']);
-            session_regenerate_id(true);
-            $_SESSION['admin_id'] = $a['id'];
-            redirect('admin/dashboard.php');
+            $s = $pdo->prepare('SELECT id, password_hash FROM admins WHERE email = ?');
+            $s->execute([$email]);
+            $a = $s->fetch();
+
+            if (!$a || !password_verify($pw, $a['password_hash'])) {
+                $rl['attempts'][] = $now;
+                $err = 'Invalid admin credentials.';
+            } else {
+                unset($_SESSION['admin_login_rl']);
+                session_regenerate_id(true);
+                $_SESSION['admin_id'] = $a['id'];
+                redirect('admin/dashboard.php');
+            }
         }
     }
 }
@@ -59,13 +65,11 @@ include __DIR__.'/../includes/header.php';
 
   <!-- ── LEFT: ADMIN BRANDING PANEL ── -->
   <div class="auth-left admin-login-left">
-    <!-- Decorative shapes -->
     <div class="auth-shape" style="width:320px;height:320px;top:-90px;right:-90px;"></div>
     <div class="auth-shape" style="width:180px;height:180px;bottom:60px;left:-50px;animation:auth-float 11s ease-in-out infinite;"></div>
     <div class="auth-shape" style="width:80px;height:80px;top:38%;left:12%;animation:auth-float 7s ease-in-out infinite reverse;"></div>
 
     <div class="auth-left-content">
-      <!-- System badge -->
       <div class="auth-brand-badge">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="opacity:.9;">
           <rect x="3" y="11" width="18" height="11" rx="2"/>
@@ -77,7 +81,6 @@ include __DIR__.'/../includes/header.php';
       <div class="auth-brand-title">Admin Portal</div>
       <p class="auth-brand-sub">Authorized personnel only.<br>Manage reports, users &amp; settings.</p>
 
-      <!-- Admin capabilities list -->
       <ul class="auth-features">
         <li>
           <span class="auth-feat-icon">
@@ -106,7 +109,6 @@ include __DIR__.'/../includes/header.php';
       </ul>
     </div>
 
-    <!-- Security notice at bottom of left panel -->
     <div class="admin-security-notice">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;opacity:.7;">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -119,7 +121,6 @@ include __DIR__.'/../includes/header.php';
   <div class="auth-right admin-login-right">
     <div class="auth-box">
 
-      <!-- Admin identity header -->
       <div class="admin-login-header">
         <div class="admin-login-icon">
           <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
@@ -179,7 +180,6 @@ include __DIR__.'/../includes/header.php';
         </button>
       </form>
 
-      <!-- Back to user login -->
       <div class="auth-switch" style="margin-top:1.5rem;">
         <a class="link" href="<?= BASE_URL ?>/login.php">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="vertical-align:-1px;margin-right:.25rem;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
