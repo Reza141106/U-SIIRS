@@ -124,3 +124,12 @@ CREATE TABLE contact_messages (
 -- NOTE: In production, this seed data would be replaced with a secure setup process.
 INSERT INTO admins (full_name, email, password_hash) VALUES
 ('System Admin', 'admin@utem.edu.my', '$2b$10$qx5GjiFrbf9Nr0Y6/Kb7T.UGgMRvcaWmr2RiE2gKClPhRJz.1COtG');
+
+ALTER TABLE users
+  ADD COLUMN last_login_at      DATETIME     NULL     DEFAULT NULL,
+  ADD COLUMN last_login_ip      VARCHAR(45)  NULL     DEFAULT NULL,
+  ADD COLUMN notification_email TINYINT(1)   NOT NULL DEFAULT 1;
+
+-- admins table
+ALTER TABLE admins
+  ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'admin';
