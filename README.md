@@ -1,57 +1,37 @@
-# Assalammualaikum rakan-rakan yang disayangi
+Assalammualaikum rakan-rakan yang disayangi
+U-SIIRS — UTeM Smart Infrastructure Issue Reporting System
+A web-based platform that empowers UTeM students and staff to report campus infrastructure issues and track their resolution in real time.
 
-# U-SIIRS — UTeM Smart Infrastructure Issue Reporting System
-
-> A web-based platform that empowers UTeM students and staff to report campus infrastructure issues and track their resolution in real time.
-
----
-
-## Overview
-
+Overview
 U-SIIRS is a lightweight, framework-free PHP web application built for Universiti Teknikal Malaysia Melaka (UTeM). It provides a structured channel for the university community to submit infrastructure and maintenance reports — broken facilities, electrical faults, cleanliness issues, and more — while giving administrators the tools to triage, prioritize, and resolve them efficiently.
 
----
-
-## Features
-
-### For Users
-- **Submit Reports** — Describe an issue with a title, category, location, photo attachment, and priority level
-- **Track Status** — Follow each report through `Pending → In Progress → Resolved`
-- **Edit & Manage** — Update or withdraw reports from a personal dashboard
-- **In-App Notifications** — Get notified when an admin updates your report status
-- **Contact Form** — Reach the admin team directly for general inquiries
-
-### For Admins
-- **Admin Dashboard** — Overview of all submitted reports with filtering by status and priority
-- **Status Management** — Update report status with remarks logged in a full audit trail
-- **User Management** — View, ban, or unban registered users
-- **Contact Messages** — Read and manage incoming contact form submissions
-
-### Security
-- PDO prepared statements on every database query
-- `password_hash()` / `password_verify()` (bcrypt) for all credentials
-- CSRF tokens on every form
-- File uploads validated by MIME type (`getimagesize`) and renamed to safe filenames
-- PHP execution blocked in the uploads directory via `.htaccess`
-- Access restricted to `@utem.edu.my` and `@student.utem.edu.my` email addresses
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Backend | PHP (Core / PDO) |
-| Database | MySQL / MariaDB |
-| Frontend | HTML, CSS, Vanilla JavaScript |
-| Server | Apache (via XAMPP) |
-| No frameworks | — |
-
----
-
-## Project Structure
-
-```
+Features
+For Users
+Submit Reports — Describe an issue with a title, category, location, photo attachment, and priority level
+Track Status — Follow each report through Pending → In Progress → Resolved
+Edit & Manage — Update or withdraw reports from a personal dashboard
+In-App Notifications — Get notified when an admin updates your report status
+Contact Form — Reach the admin team directly for general inquiries
+For Admins
+Admin Dashboard — Overview of all submitted reports with filtering by status and priority
+Status Management — Update report status with remarks logged in a full audit trail
+User Management — View, ban, or unban registered users
+Contact Messages — Read and manage incoming contact form submissions
+Security
+PDO prepared statements on every database query
+password_hash() / password_verify() (bcrypt) for all credentials
+CSRF tokens on every form
+File uploads validated by MIME type (getimagesize) and renamed to safe filenames
+PHP execution blocked in the uploads directory via .htaccess
+Access restricted to @utem.edu.my and @student.utem.edu.my email addresses
+Tech Stack
+Layer	Technology
+Backend	PHP (Core / PDO)
+Database	MySQL / MariaDB
+Frontend	HTML, CSS, Vanilla JavaScript
+Server	Apache (via XAMPP)
+No frameworks	—
+Project Structure
 u-siirs/
 ├── index.php               # Landing / login redirect
 ├── login.php               # User login
@@ -95,83 +75,51 @@ u-siirs/
 │
 └── sql/
     └── u_siirs.sql         # Full schema + seed data
-```
+Getting Started
+Requirements
+XAMPP (Apache + PHP 7.4+ or PHP 8.x, MySQL/MariaDB)
+Installation
+Clone or download this repository into your XAMPP htdocs directory:
 
----
+git clone https://github.com/<your-username>/u-siirs.git C:/xampp/htdocs/u-siirs
+# macOS/Linux: /Applications/XAMPP/htdocs/u-siirs
+Start Apache and MySQL from the XAMPP Control Panel.
 
-## Getting Started
+Import the database — open http://localhost/phpmyadmin, click the Import tab, choose sql/u_siirs.sql, and click Go. This creates the u_siirs database with all tables and a default admin account.
 
-### Requirements
-- [XAMPP](https://www.apachefriends.org/) (Apache + PHP 7.4+ or PHP 8.x, MySQL/MariaDB)
+(Optional) If your MySQL root account uses a password, update config/database.php:
 
-### Installation
+$DB_PASS = 'your_password_here';
+On Linux/macOS, make the uploads directory writable:
 
-1. **Clone or download** this repository into your XAMPP `htdocs` directory:
-   ```bash
-   git clone https://github.com/<your-username>/u-siirs.git C:/xampp/htdocs/u-siirs
-   # macOS/Linux: /Applications/XAMPP/htdocs/u-siirs
-   ```
+chmod 775 assets/uploads
+Visit the app at http://localhost/u-siirs/
 
-2. **Start Apache and MySQL** from the XAMPP Control Panel.
+Default Admin Account
+Field	Value
+URL	http://localhost/u-siirs/admin/login.php
+Email	admin@utem.edu.my
+Password	Admin@123
+⚠️ Change the default password immediately after your first login.
 
-3. **Import the database** — open `http://localhost/phpmyadmin`, click the **Import** tab, choose `sql/u_siirs.sql`, and click **Go**. This creates the `u_siirs` database with all tables and a default admin account.
-
-4. *(Optional)* If your MySQL root account uses a password, update `config/database.php`:
-   ```php
-   $DB_PASS = 'your_password_here';
-   ```
-
-5. **On Linux/macOS**, make the uploads directory writable:
-   ```bash
-   chmod 775 assets/uploads
-   ```
-
-6. **Visit the app** at `http://localhost/u-siirs/`
-
-### Default Admin Account
-
-| Field | Value |
-|---|---|
-| URL | `http://localhost/u-siirs/admin/login.php` |
-| Email | `admin@utem.edu.my` |
-| Password | `Admin@123` |
-
-> ⚠️ **Change the default password immediately after your first login.**
-
----
-
-## Database Schema
-
-| Table | Purpose |
-|---|---|
-| `users` | Registered UTeM users |
-| `admins` | Admin accounts |
-| `reports` | Infrastructure issue reports |
-| `report_attachments` | Photos attached to reports |
-| `status_updates` | Audit log of all status changes |
-| `notifications` | In-app notifications for users |
-| `contact_messages` | Contact form submissions |
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| *Database connection failed* | Ensure MySQL is running; check credentials in `config/database.php` |
-| *Invalid CSRF token* | Clear cookies / restart browser — sessions may have expired |
-| *Images not showing* | Confirm files exist in `assets/uploads` and Apache can read them |
-| *Login redirect loop* | Clear the `PHPSESSID` cookie for `localhost` |
-| *Path issues* | Keep the folder named `u-siirs` — `BASE_URL` auto-detects from the folder name |
-
----
-
-## Contributing
-
+Database Schema
+Table	Purpose
+users	Registered UTeM users
+admins	Admin accounts
+reports	Infrastructure issue reports
+report_attachments	Photos attached to reports
+status_updates	Audit log of all status changes
+notifications	In-app notifications for users
+contact_messages	Contact form submissions
+Troubleshooting
+Problem	Fix
+Database connection failed	Ensure MySQL is running; check credentials in config/database.php
+Invalid CSRF token	Clear cookies / restart browser — sessions may have expired
+Images not showing	Confirm files exist in assets/uploads and Apache can read them
+Login redirect loop	Clear the PHPSESSID cookie for localhost
+Path issues	Keep the folder named u-siirs — BASE_URL auto-detects from the folder name
+Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
----
-
-## License
-
+License
 This project is developed for academic purposes at UTeM. All rights reserved by the respective contributors.

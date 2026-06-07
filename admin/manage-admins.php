@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors = [];
         if (strlen($name) < 2)  $errors[] = 'Name must be at least 2 characters.';
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email address.';
+        if (!str_ends_with($email, '@utem.edu.my')) $errors[] = 'Admin email must end with @utem.edu.my.';
         if (strlen($pw) < 8)    $errors[] = 'Password must be at least 8 characters.';
 
         // Check email unique
@@ -33,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             )->execute([$name, $email, password_hash($pw, PASSWORD_DEFAULT), $role]);
 
             $newId = (int)$pdo->lastInsertId();
-            // Audit log
             $pdo->prepare(
                 'INSERT INTO admin_activity_log (admin_id, action, target_type, target_id, details) VALUES (?,?,?,?,?)'
             )->execute([$_SESSION['admin_id'], 'create_admin', 'admin', $newId, "Created admin account for {$name} ({$email}) with role {$role}"]);
@@ -112,7 +112,7 @@ include __DIR__.'/_nav.php';
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" class="form-control" name="email" required>
+        <input type="email" class="form-control" name="email" required placeholder="name@utem.edu.my">
       </div>
       <div class="form-group">
         <label class="form-label">Password</label>
@@ -120,7 +120,7 @@ include __DIR__.'/_nav.php';
           <input type="password" class="form-control" name="password" id="create-admin-pw" required minlength="8" style="padding-right:2.8rem;">
           <button type="button"
                   onclick="togglePw('create-admin-pw', this)"
-                  style="position:absolute;right:.6rem;background:none;border:none;cursor:pointer;color:var(--text-muted,#6b7280);padding:0;line-height:1;font-size:1.1rem;"
+                  style="position:absolute;right:.6rem;background:none;border:none;cursor:pointer;color:var(--text-muted,#6b7280);padding:0;line-height:1;"
                   title="Show/hide password"
                   aria-label="Toggle password visibility">
             <svg id="create-admin-pw-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -171,7 +171,6 @@ include __DIR__.'/_nav.php';
                           data-confirm="Deactivate this admin account?">Deactivate</button>
                 </form>
               <?php endif; ?>
-              <!-- Reset password inline form -->
               <details style="display:inline-block;">
                 <summary class="btn btn-sm btn-outline" style="cursor:pointer;list-style:none;">Reset PW</summary>
                 <form method="post" style="margin-top:.5rem;background:var(--surface2,#f8fafc);padding:.75rem;border-radius:6px;min-width:220px;">
@@ -183,7 +182,7 @@ include __DIR__.'/_nav.php';
                            placeholder="New password" required minlength="8" style="padding-right:2.8rem;">
                     <button type="button"
                             onclick="togglePw('reset-pw-<?= (int)$a['id'] ?>', this)"
-                            style="position:absolute;right:.6rem;background:none;border:none;cursor:pointer;color:var(--text-muted,#6b7280);padding:0;line-height:1;font-size:1.1rem;"
+                            style="position:absolute;right:.6rem;background:none;border:none;cursor:pointer;color:var(--text-muted,#6b7280);padding:0;line-height:1;"
                             title="Show/hide password"
                             aria-label="Toggle password visibility">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
