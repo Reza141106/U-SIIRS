@@ -154,3 +154,5 @@ ALTER TABLE users
 -- admins table – role uses enum to match ERD values
 ALTER TABLE admins
   ADD COLUMN role ENUM('super_admin','admin','deactivated') NOT NULL DEFAULT 'admin';
+
+  UPDATE admins SET role = 'super_admin' WHERE email = 'admin@utem.edu.my';
