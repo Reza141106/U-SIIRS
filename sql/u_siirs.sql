@@ -7,12 +7,18 @@
 --     on the admin badge query (SELECT COUNT(*) WHERE is_read=0) run on every page.
 --   - Added INDEX idx_created_at on reports (created_at) since most list queries
 --     ORDER BY this column.
+--   - Added admin_activity_log table (admin_id, action, target_type, target_id,
+--     details) with composite index on (target_type, target_id) for efficient
+--     per-entity audit lookups, plus indexes on admin_id and created_at.
+--   - Changed admins.role from VARCHAR(20) to ENUM('super_admin','admin','deactivated')
+--     to match the ERD and enforce valid values at the DB level.
 -- ============================================================================
 
 CREATE DATABASE IF NOT EXISTS u_siirs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE u_siirs;
 
 DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS admin_activity_log;
 DROP TABLE IF EXISTS status_updates;
 DROP TABLE IF EXISTS report_attachments;
 DROP TABLE IF EXISTS reports;
@@ -119,6 +125,21 @@ CREATE TABLE contact_messages (
     INDEX idx_created   (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Admin Activity Log ────────────────────────────────────────────────────────
+CREATE TABLE admin_activity_log (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    admin_id    INT           NOT NULL,
+    action      VARCHAR(100)  NOT NULL,
+    target_type VARCHAR(50)   DEFAULT NULL,
+    target_id   INT           DEFAULT NULL,
+    details     TEXT          DEFAULT NULL,
+    created_at  TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_log_admin FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE,
+    INDEX idx_log_admin      (admin_id),
+    INDEX idx_log_target     (target_type, target_id),
+    INDEX idx_log_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── Default Admin Account ──────────────────────────────────────────────────────
 -- Credentials: admin@utem.edu.my / Admin@123
 -- NOTE: In production, this seed data would be replaced with a secure setup process.
@@ -130,6 +151,6 @@ ALTER TABLE users
   ADD COLUMN last_login_ip      VARCHAR(45)  NULL     DEFAULT NULL,
   ADD COLUMN notification_email TINYINT(1)   NOT NULL DEFAULT 1;
 
--- admins table
+-- admins table – role uses enum to match ERD values
 ALTER TABLE admins
-  ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'admin';
+  ADD COLUMN role ENUM('super_admin','admin','deactivated') NOT NULL DEFAULT 'admin';
