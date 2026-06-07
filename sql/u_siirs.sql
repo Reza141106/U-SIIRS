@@ -155,4 +155,4 @@ ALTER TABLE users
 ALTER TABLE admins
   ADD COLUMN role ENUM('super_admin','admin','deactivated') NOT NULL DEFAULT 'admin';
 
-  UPDATE admins SET role = 'super_admin' WHERE email = 'your-admin@email.com';
+  UPDATE admins SET role = 'super_admin' WHERE email = 'admin@utem.edu.my';
