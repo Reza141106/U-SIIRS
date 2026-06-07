@@ -1,7 +1,6 @@
 <?php require_once __DIR__.'/includes/auth-check.php';
 $uid = $_SESSION['user_id'];
 
-// ── Delete a single attachment — FIXED: now POST form instead of GET link
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['del_att'])) {
     csrf_check();
     $aid = (int)$_POST['del_att'];
