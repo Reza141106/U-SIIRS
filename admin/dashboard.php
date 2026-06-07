@@ -219,7 +219,7 @@ include __DIR__.'/_nav.php';
   <?php if (!empty($trend)): ?>
   <div class="card" style="margin-bottom:2rem;">
     <h3 class="card-section-title">Monthly Trend (Last 6 Months)</h3>
-    <?php $tMax = max(array_column($trend, 'cnt'), 1); ?>
+    <?php $tMax = max(max(array_column($trend, 'cnt')), 1); ?>
     <div class="trend-bars">
       <?php foreach ($trend as $t):
           $tPct = round(($t['cnt'] / $tMax) * 100);

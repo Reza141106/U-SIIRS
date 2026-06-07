@@ -115,16 +115,37 @@ include __DIR__.'/includes/navbar.php';
         <input type="hidden" name="action" value="change_password">
         <div class="form-group">
           <label class="form-label">Current Password</label>
-          <input type="password" class="form-control" name="current" required autocomplete="current-password">
+          <div class="input-wrap">
+            <input id="currentPwField" type="password" class="form-control" name="current" required autocomplete="current-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('currentPwField', this)" aria-label="Show or hide password">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">New Password</label>
-          <input type="password" class="form-control" name="password" required minlength="8" autocomplete="new-password">
+          <div class="input-wrap">
+            <input id="newPwField" type="password" class="form-control" name="password" required minlength="8" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('newPwField', this)" aria-label="Show or hide password">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
           <div class="form-hint">Min 8 chars — must include uppercase, lowercase, and a digit.</div>
         </div>
         <div class="form-group">
           <label class="form-label">Confirm New Password</label>
-          <input type="password" class="form-control" name="password2" required minlength="8" autocomplete="new-password">
+          <div class="input-wrap">
+            <input id="confirmPwField" type="password" class="form-control" name="password2" required minlength="8" autocomplete="new-password">
+            <button type="button" class="pw-toggle" onclick="togglePw('confirmPwField', this)" aria-label="Show or hide password">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <button class="btn btn-primary">Update Password</button>
       </form>
