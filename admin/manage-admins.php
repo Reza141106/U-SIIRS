@@ -59,6 +59,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('admin/manage-admins.php');
     }
 
+    if ($action === 'activate') {
+        $id = (int)($_POST['id'] ?? 0);
+        $pdo->prepare("UPDATE admins SET role = 'admin' WHERE id = ? AND role = 'deactivated'")->execute([$id]);
+        $pdo->prepare(
+            'INSERT INTO admin_activity_log (admin_id, action, target_type, target_id, details) VALUES (?,?,?,?,?)'
+        )->execute([$_SESSION['admin_id'], 'activate_admin', 'admin', $id, "Admin account reactivated"]);
+        flash('success', 'Admin account has been reactivated.');
+        redirect('admin/manage-admins.php');
+    }
+
+    if ($action === 'delete') {
+        $id = (int)($_POST['id'] ?? 0);
+        // Only allow deleting deactivated admins, and never the current super admin
+        if ($id === (int)$_SESSION['admin_id']) {
+            flash('error', 'You cannot delete your own account.');
+        } else {
+            $target = $pdo->prepare("SELECT role FROM admins WHERE id = ?");
+            $target->execute([$id]);
+            $row = $target->fetch();
+            if (!$row || $row['role'] !== 'deactivated') {
+                flash('error', 'Only deactivated admin accounts can be deleted.');
+            } else {
+                $pdo->prepare("DELETE FROM admins WHERE id = ? AND role = 'deactivated'")->execute([$id]);
+                $pdo->prepare(
+                    'INSERT INTO admin_activity_log (admin_id, action, target_type, target_id, details) VALUES (?,?,?,?,?)'
+                )->execute([$_SESSION['admin_id'], 'delete_admin', 'admin', $id, "Deactivated admin account permanently deleted"]);
+                flash('success', 'Admin account permanently deleted.');
+            }
+        }
+        redirect('admin/manage-admins.php');
+    }
+
     if ($action === 'reset_password') {
         $id    = (int)($_POST['id'] ?? 0);
         $newPw = $_POST['new_password'] ?? '';
@@ -86,7 +118,7 @@ include __DIR__.'/_nav.php';
 ?>
 <div class="page-header">
   <h1>Manage Admin Accounts</h1>
-  <p>Create, deactivate, or reset passwords for admin accounts. Super Admin access required.</p>
+  <p>Create, deactivate, reactivate, or delete admin accounts. Super Admin access required.</p>
 </div>
 <div class="container">
 
@@ -169,6 +201,22 @@ include __DIR__.'/_nav.php';
                   <input type="hidden" name="id"     value="<?= (int)$a['id'] ?>">
                   <button class="btn btn-sm btn-outline"
                           data-confirm="Deactivate this admin account?">Deactivate</button>
+                </form>
+              <?php endif; ?>
+              <?php if ($a['role'] === 'deactivated'): ?>
+                <form method="post" class="form-inline">
+                  <input type="hidden" name="csrf"   value="<?= e(csrf_token()) ?>">
+                  <input type="hidden" name="action" value="activate">
+                  <input type="hidden" name="id"     value="<?= (int)$a['id'] ?>">
+                  <button class="btn btn-sm btn-success"
+                          data-confirm="Reactivate this admin account?">Activate</button>
+                </form>
+                <form method="post" class="form-inline">
+                  <input type="hidden" name="csrf"   value="<?= e(csrf_token()) ?>">
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="id"     value="<?= (int)$a['id'] ?>">
+                  <button class="btn btn-sm btn-danger"
+                          data-confirm="Permanently delete this admin account? This cannot be undone.">Delete</button>
                 </form>
               <?php endif; ?>
               <details style="display:inline-block;">
