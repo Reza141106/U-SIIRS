@@ -1286,3 +1286,19 @@ The system not only solves current reporting inefficiencies but also lays the fo
 ---
 
 ## 🔚 End of Extended Documentation
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
