@@ -56,8 +56,8 @@ if ($r['user_id']) {
 
     // Always insert in-app notification
     $pdo->prepare(
-        'INSERT INTO notifications (user_id, report_id, message, type) VALUES (?, ?, ?, ?)'
-    )->execute([$r['user_id'], $id, $msg, 'status_update']);
+         'INSERT INTO notifications (user_id, report_id, message) VALUES (?, ?, ?)'
+    )->execute([$r['user_id'], $id, $msg]);
 
     // Send email only if user has not opted out
     if ($pref === null || $pref == 1) {
