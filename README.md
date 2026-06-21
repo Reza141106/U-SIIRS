@@ -1302,3 +1302,1664 @@ if ($user && password_verify($password, $user['password'])) {
 } else {
     $error = "Invalid credentials";
 }
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
+# 🔧 Additional Technical Implementation Details
+
+# 🧩 Backend Logic (Core PHP Examples)
+
+## 🔐 Authentication (Login Example)
+```php
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$user = $stmt->fetch();
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    header("Location: dashboard.php");
+} else {
+    $error = "Invalid credentials";
+}
+📝 Submit Report (Insert Query)
+$stmt = $pdo->prepare("
+INSERT INTO reports (user_id, title, description, category, location, priority, status, created_at)
+VALUES (:user_id, :title, :description, :category, :location, :priority, 'Pending', NOW())
+");
+
+$stmt->execute([
+    'user_id' => $_SESSION['user_id'],
+    'title' => $title,
+    'description' => $description,
+    'category' => $category,
+    'location' => $location,
+    'priority' => $priority
+]);
+🔄 Update Report Status
+$stmt = $pdo->prepare("
+UPDATE reports 
+SET status = :status, updated_at = NOW() 
+WHERE id = :id
+");
+
+$stmt->execute([
+    'status' => $status,
+    'id' => $report_id
+]);
+🔔 Insert Notification
+$stmt = $pdo->prepare("
+INSERT INTO notifications (user_id, message, created_at)
+VALUES (:user_id, :message, NOW())
+");
+
+$stmt->execute([
+    'user_id' => $user_id,
+    'message' => $message
+]);
+🗄 Extended Database Structure
+📌 reports Table
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100),
+    location VARCHAR(255),
+    priority ENUM('Low','Medium','High') DEFAULT 'Medium',
+    status ENUM('Pending','In Progress','Resolved') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+📌 notifications Table
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT,
+    is_read BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📌 status_updates Table
+CREATE TABLE status_updates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id INT,
+    status VARCHAR(50),
+    remarks TEXT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+📂 File Upload Handling
+$targetDir = "assets/uploads/";
+$fileName = uniqid() . "_" . basename($_FILES["image"]["name"]);
+$targetFile = $targetDir . $fileName;
+
+$imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+if (getimagesize($_FILES["image"]["tmp_name"]) !== false) {
+    if ($_FILES["image"]["size"] <= 2000000) {
+        move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
+    }
+}
+🧠 Session Handling
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+🛡 Admin Protection
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+📊 Dashboard Query
+$total = $pdo->query("SELECT COUNT(*) FROM reports")->fetchColumn();
+$pending = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Pending'")->fetchColumn();
+$progress = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='In Progress'")->fetchColumn();
+$resolved = $pdo->query("SELECT COUNT(*) FROM reports WHERE status='Resolved'")->fetchColumn();
+🎯 API Structure
+GET    /reports
+POST   /reports
+PUT    /reports/{id}
+DELETE /reports/{id}
+GET    /notifications
+⚡ Error Handling
+try {
+    $pdo = new PDO($dsn, $user, $pass);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+📌 .htaccess Security
+Options -Indexes
+<FilesMatch "\.(env|ini|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+🧪 Sample Data
+INSERT INTO users (name, email, password)
+VALUES ('Test User', 'test@student.utem.edu.my', '$2y$10$examplehash');
+🔄 Cron Job
+0 * * * * php /path/to/notify.php
+📈 Index Optimization
+CREATE INDEX idx_status ON reports(status);
+CREATE INDEX idx_user_id ON reports(user_id);
+🧭 Routing Concept
+$page = $_GET['page'] ?? 'home';
+
+switch($page) {
+    case 'dashboard':
+        include 'dashboard.php';
+        break;
+    case 'report':
+        include 'submit-report.php';
+        break;
+    default:
+        include 'index.php';
+}
