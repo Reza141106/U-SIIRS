@@ -55,7 +55,7 @@ include __DIR__.'/includes/header.php';
       <ul class="auth-features">
         <li><span class="auth-feat-icon">&#x1F4CB;</span> Submit and track issue reports</li>
         <li><span class="auth-feat-icon">&#x1F514;</span> Real-time status notifications</li>
-        <li><span class="auth-feat-icon">&#x1F512;</span> Secure UTeM student access</li>
+        <li><span class="auth-feat-icon">&#x1F512;</span> Secure UTeM staff & student access</li>
         <li><span class="auth-feat-icon">&#x1F4CA;</span> View your report history</li>
       </ul>
     </div>
