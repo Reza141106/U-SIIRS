@@ -8,7 +8,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $pw2 = $_POST['password2'] ?? '';
     if (strlen($name)<2 || strlen($name)>100) $err='Name must be 2-100 chars.';
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $err='Invalid email.';
-    elseif (!preg_match('/^[a-z]\d{9}@student\.utem\.edu\.my$/i', $email)) $err='Must use a valid UTeM student email (e.g. D032410372@student.utem.edu.my).';
+    elseif (!preg_match('/^([a-z]\d{9}@student\.utem\.edu\.my|[a-z0-9._%+\-]+@utem\.edu\.my)$/i', $email))
+    $err='Must use a valid UTeM Staff/Student email.';
     elseif (strlen($pw)<8) $err='Password must be at least 8 characters.';
     elseif (!preg_match('/[A-Z]/',$pw) || !preg_match('/[a-z]/',$pw) || !preg_match('/[0-9]/',$pw)) $err='Password must include upper, lower and digit.';
     elseif ($pw !== $pw2) $err='Passwords do not match.';
@@ -50,7 +51,7 @@ include __DIR__.'/includes/header.php';
       <form method="post">
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <div class="form-group"><label class="form-label">Full Name</label><input class="form-control" name="full_name" required maxlength="100" value="<?= e($_POST['full_name'] ?? '') ?>"></div>
-        <div class="form-group"><label class="form-label">UTeM Student Email</label><input type="email" class="form-control" name="email" required maxlength="255" value="<?= e($_POST['email'] ?? '') ?>" placeholder="D032410372@student.utem.edu.my"></div>
+        <div class="form-group"><label class="form-label">UTeM Staff/Student Email</label><input type="email" class="form-control" name="email" required maxlength="255" value="<?= e($_POST['email'] ?? '') ?>" placeholder="UTeM Staff/Student Email"></div>
         <div class="form-group">
           <label class="form-label">Password</label>
           <div class="input-wrap">
