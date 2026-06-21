@@ -141,18 +141,19 @@ include __DIR__.'/includes/navbar.php';
       <?php endif; ?>
     </div>
 
-    <!-- Office Info -->
+     <!-- Office Info -->
     <div class="contact-info-col">
       <h3 class="contact-col-title">Facilities Office</h3>
       <div class="contact-info-block">
         <p class="text-muted">
-          <strong>Jabatan Pembangunan &amp; Pengurusan Aset (JPPA)</strong><br>
-          Universiti Teknikal Malaysia Melaka<br>
-          Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
+          <strong>Pejabat Pengurusan Fasiliti (PPF)</strong><br>
+          Universiti Teknikal Malaysia Melaka (UTeM)<br>
+          Hang Tuah Jaya, 76100 Durian Tunggal, Melaka, Malaysia
         </p>
         <p class="text-muted contact-office-links">
-          📞 <a href="tel:+60627011000" class="link">+606-270 1000</a><br>
-          ✉️ <a href="mailto:jppa@utem.edu.my" class="link">jppa@utem.edu.my</a>
+          📞 <a href="tel:+60627021150" class="link">Tel: +062702115</a><br>
+          📠 <a href="tel:+60627010590" class="link">Faks: +062701059</a><br>
+          ✉️ <a href="mailto:ppf@utem.edu.my" class="link">ppf@utem.edu.my</a>
         </p>
         <div class="contact-hours">
           <strong>Office Hours</strong>
