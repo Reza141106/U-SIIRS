@@ -44,7 +44,7 @@ include __DIR__.'/includes/header.php';
     <div class="auth-left-content">
       <div class="auth-brand-badge">&#x1F511; Account Recovery</div>
       <div class="auth-brand-title">Reset Password</div>
-      <p class="auth-brand-sub">Enter your UTeM email to receive<br>a secure reset link.</p>
+      <p class="auth-brand-sub">Enter your UTeM staff or student email to receive a secure reset link.</p>
     </div>
   </div>
   <div class="auth-right">
