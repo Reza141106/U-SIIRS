@@ -1786,5 +1786,20 @@ img.thumb { width: 100%; max-height: 360px; object-fit: cover; border-radius: va
   -webkit-overflow-scrolling: touch;
 }
 
+/* Admin tables: wider min-width to prevent column squishing */
+.admin-main .table-scroll table { min-width: 800px; }
+
+/* Prevent select from overflowing its card on mobile */
+.card .form-group { position: relative; }
+.card select.form-control {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+  .card { overflow: visible; }
+  .row-grid { overflow: visible; }
+}
+
 /* Admin tables have more columns — need wider min-width */
 .admin-main .table-scroll table { min-width: 800px; }
