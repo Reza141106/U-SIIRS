@@ -1785,3 +1785,6 @@ img.thumb { width: 100%; max-height: 360px; object-fit: cover; border-radius: va
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Admin tables have more columns — need wider min-width */
+.admin-main .table-scroll table { min-width: 800px; }
