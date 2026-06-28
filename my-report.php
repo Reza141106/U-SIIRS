@@ -46,6 +46,8 @@ include __DIR__.'/includes/navbar.php';
       <input id="tableSearch" class="search-input" placeholder="Search title or location…" value="<?= e($q) ?>">
       <span style="color:var(--text3);font-size:.85rem;"><?= $total ?> report<?= $total!==1?'s':'' ?></span>
     </div>
+
+    <div class="table-scroll">  <!-- ✅ ADDED: prevents horizontal overflow on mobile -->
     <table>
       <thead><tr><th>Title</th><th>Category</th><th>Location</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
       <tbody>
@@ -81,6 +83,7 @@ include __DIR__.'/includes/navbar.php';
       <?php endforeach; endif; ?>
       </tbody>
     </table>
+    </div>  <!-- ✅ ADDED: /table-scroll -->
 
     <?php if($totalPages > 1): ?>
     <div class="pagination">
