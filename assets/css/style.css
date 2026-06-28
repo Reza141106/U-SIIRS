@@ -1753,3 +1753,35 @@ img.thumb { width: 100%; max-height: 360px; object-fit: cover; border-radius: va
   font-size: 0.875rem;
   padding: 0.82rem 1.4rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE PATCH — Mobile polish fixes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Reduce container & page-header padding on small phones */
+@media (max-width: 480px) {
+  .container { padding: 1rem 0.75rem; }
+  .page-header { padding: 1rem 0.75rem 0.5rem; }
+}
+
+/* Notification panel — prevent right-edge overflow on narrow screens */
+@media (max-width: 400px) {
+  .notif-panel {
+    right: -3rem;
+    min-width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Navbar: hide username text on very small screens, keep avatar & bell */
+@media (max-width: 380px) {
+  .nav-user-name { display: none; }
+  .nav-right { gap: 0.25rem; }
+  .navbar { padding: 0 1rem; }
+}
+
+/* Ensure table-scroll works inside table-wrapper */
+.table-wrapper .table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
