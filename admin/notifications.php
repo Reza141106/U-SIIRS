@@ -86,7 +86,7 @@ include __DIR__.'/_nav.php';
           <!-- View link -->
           <?php if ($n['report_id']): ?>
             <a class="btn btn-sm btn-outline" style="flex-shrink:0;"
-               href="<?= BASE_URL ?>/admin/reports-view.php?id=<?= (int)$n['report_id'] ?>">
+               href="<?= BASE_URL ?>/admin/report-view.php?id=<?= (int)$n['report_id'] ?>">
               View →
             </a>
           <?php endif; ?>

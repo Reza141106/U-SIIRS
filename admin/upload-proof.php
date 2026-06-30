@@ -24,23 +24,23 @@ if (!$check->fetch()) {
 // Validate file
 if (empty($_FILES['proof_photo']) || $_FILES['proof_photo']['error'] === UPLOAD_ERR_NO_FILE) {
     flash('error', 'Please select a photo to upload.');
-    redirect('admin/reports-view.php?id=' . $reportId);
+    redirect('admin/report-view.php?id=' . $reportId);
 }
 
 if ($_FILES['proof_photo']['error'] !== UPLOAD_ERR_OK) {
     flash('error', 'Upload failed. Please try again.');
-    redirect('admin/reports-view.php?id=' . $reportId);
+    redirect('admin/report-view.php?id=' . $reportId);
 }
 
 if ($_FILES['proof_photo']['size'] > 5 * 1024 * 1024) {
     flash('error', 'Proof photo must be under 5 MB.');
-    redirect('admin/reports-view.php?id=' . $reportId);
+    redirect('admin/report-view.php?id=' . $reportId);
 }
 
 $info = getimagesize($_FILES['proof_photo']['tmp_name']);
 if (!$info || !in_array($info['mime'], ['image/jpeg', 'image/png'], true)) {
     flash('error', 'Only JPG and PNG images are accepted.');
-    redirect('admin/reports-view.php?id=' . $reportId);
+    redirect('admin/report-view.php?id=' . $reportId);
 }
 
 $ext       = ($info['mime'] === 'image/png') ? 'png' : 'jpg';
@@ -50,7 +50,7 @@ $uploadDir = __DIR__ . '/../assets/uploads/';
 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 if (!move_uploaded_file($_FILES['proof_photo']['tmp_name'], $uploadDir . $filename)) {
     flash('error', 'Could not save the file. Please try again.');
-    redirect('admin/reports-view.php?id=' . $reportId);
+    redirect('admin/report-view.php?id=' . $reportId);
 }
 
 // Save to DB
@@ -78,4 +78,4 @@ if ($rep) {
 }
 
 flash('success', 'Proof photo uploaded successfully.');
-redirect('admin/reports-view.php?id=' . $reportId);
+redirect('admin/report-view.php?id=' . $reportId);
