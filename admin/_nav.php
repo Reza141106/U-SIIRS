@@ -3,9 +3,10 @@
  * admin/_nav.php
  * UPDATED: Added Audit Log and Manage Admins links (super_admin only).
  */
-$current     = basename($_SERVER['PHP_SELF']);
-$unreadCount = (int)$pdo->query('SELECT COUNT(*) FROM contact_messages WHERE is_read = 0')->fetchColumn();
-$isSuperAdmin = ($CURRENT_ADMIN['role'] ?? 'admin') === 'super_admin';
+$current          = basename($_SERVER['PHP_SELF']);
+$unreadCount      = (int)$pdo->query('SELECT COUNT(*) FROM contact_messages WHERE is_read = 0')->fetchColumn();
+$unreadAdminNotif = (int)$pdo->query('SELECT COUNT(*) FROM admin_notifications WHERE is_read = 0')->fetchColumn();
+$isSuperAdmin     = ($CURRENT_ADMIN['role'] ?? 'admin') === 'super_admin';
 ?>
 <nav class="navbar">
   <div class="nav-logo nav-logo-admin">U-<span>SIIRS</span><span class="nav-admin-badge">· Admin</span></div>
@@ -13,6 +14,22 @@ $isSuperAdmin = ($CURRENT_ADMIN['role'] ?? 'admin') === 'super_admin';
     <button class="hamburger admin-hamburger" id="adminHamburger" aria-label="Toggle sidebar">
       <span></span><span></span><span></span>
     </button>
+    <!-- Admin notification bell -->
+    <a href="<?= BASE_URL ?>/admin/notifications.php"
+       title="New report notifications"
+       style="position:relative;display:inline-flex;align-items:center;margin-right:.5rem;color:var(--text1);text-decoration:none;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <?php if ($unreadAdminNotif > 0): ?>
+        <span style="position:absolute;top:-5px;right:-6px;background:#e53935;color:#fff;
+                     font-size:.6rem;font-weight:700;border-radius:50%;min-width:16px;height:16px;
+                     display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;">
+          <?= $unreadAdminNotif > 9 ? '9+' : $unreadAdminNotif ?>
+        </span>
+      <?php endif; ?>
+    </a>
     <div class="avatar avatar-admin"><?= strtoupper(substr($CURRENT_ADMIN['full_name'], 0, 1)) ?></div>
     <span class="nav-admin-name"><?= e($CURRENT_ADMIN['full_name']) ?>
       <?php if ($isSuperAdmin): ?>

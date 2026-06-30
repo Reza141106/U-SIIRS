@@ -156,3 +156,41 @@ ALTER TABLE admins
   ADD COLUMN role ENUM('super_admin','admin','deactivated') NOT NULL DEFAULT 'admin';
 
   UPDATE admins SET role = 'super_admin' WHERE email = 'admin@utem.edu.my';
+
+-- ============================================================================
+-- v2 Additions: Map coordinates, admin notifications, proof media
+-- ============================================================================
+
+-- Map coordinates on reports
+ALTER TABLE reports
+  ADD COLUMN IF NOT EXISTS latitude  DECIMAL(10,8) DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS longitude DECIMAL(11,8) DEFAULT NULL;
+
+-- Fix type column on user notifications
+ALTER TABLE notifications
+  ADD COLUMN IF NOT EXISTS type VARCHAR(50) NOT NULL DEFAULT 'status_update';
+
+-- Admin notifications (new report alerts)
+CREATE TABLE IF NOT EXISTS admin_notifications (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    report_id  INT          DEFAULT NULL,
+    message    VARCHAR(500) NOT NULL,
+    is_read    TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_an_report FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE SET NULL,
+    INDEX idx_an_is_read (is_read),
+    INDEX idx_an_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admin proof media (work-in-progress evidence)
+CREATE TABLE IF NOT EXISTS report_progress_media (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    report_id  INT          NOT NULL,
+    admin_id   INT          NOT NULL,
+    filename   VARCHAR(255) NOT NULL,
+    caption    VARCHAR(300) DEFAULT NULL,
+    created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_rpm_report FOREIGN KEY (report_id) REFERENCES reports(id)  ON DELETE CASCADE,
+    CONSTRAINT fk_rpm_admin  FOREIGN KEY (admin_id)  REFERENCES admins(id)   ON DELETE CASCADE,
+    INDEX idx_rpm_report (report_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
