@@ -56,6 +56,8 @@ include __DIR__.'/../includes/header.php';
 include __DIR__.'/_nav.php';
 ?>
 
+  <div class="admin-main">
+
 <div class="page-header flex-between">
   <div>
     <h1><?= e($r['title']) ?></h1>
@@ -201,6 +203,8 @@ include __DIR__.'/_nav.php';
 
   </div>
 </div>
+
+</div><!-- /admin-main -->
 
 <?php include __DIR__.'/../includes/lightbox.php'; ?>
 <?php include __DIR__.'/../includes/footer.php'; ?>
