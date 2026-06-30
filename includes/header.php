@@ -18,6 +18,7 @@ require_once __DIR__ . '/../config/database.php';
   <!-- Google Fonts — gracefully degrades to system fonts if offline -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+  <?php if (!empty($EXTRA_HEAD)) echo $EXTRA_HEAD; ?>
 </head>
 <body>
 <div class="page active">
